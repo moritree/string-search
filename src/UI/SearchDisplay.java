@@ -56,6 +56,9 @@ sealed interface SearchDisplay permits KMPDisplay, BoyerMooreDisplay {
 
     /**
      * Draw text and patt fields, with default coloring
+     * <br>The interface default method applies to all types of <code>SearchDisplay</code>
+     * and is called from concrete record <code>draw()</code> methods after any
+     * implementation specific details are done.
      */
     default void draw() {
         // setup layout constraints
@@ -90,7 +93,14 @@ sealed interface SearchDisplay permits KMPDisplay, BoyerMooreDisplay {
         panel().repaint();
     }
 
-    static void colourMatchedChar(SearchAlgorithm.MatchInfo match, Map<Field, List<? extends CharBox>> fieldComponents, JPanel panel) {
+    /**
+     * Colour a character based on its match status at this point in the progress of the algorithm.
+     * @param match information about the state of a character match
+     * @param fieldComponents the CharBox components corresponding to each display text field
+     * @param panel panel to repaint
+     */
+    static void colourMatchedChar(SearchAlgorithm.MatchInfo match,
+                                  Map<Field, List<? extends CharBox>> fieldComponents, JPanel panel) {
         // colour depends on whether this char was a match or mismatch
         Color col = match.match() ? CharBox.MATCH_COL() : CharBox.MISMATCH_COL();
 

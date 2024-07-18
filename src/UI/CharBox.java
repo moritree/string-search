@@ -17,11 +17,9 @@ public interface CharBox {
     static Color DEFAULT_COL() {
         return Color.LIGHT_GRAY;
     }
-
     static Color MISMATCH_COL() {
         return Color.RED;
     }
-
     static Color MATCH_COL() {
         return Color.GREEN;
     }

@@ -97,10 +97,9 @@ sealed interface SearchDisplay permits KMPDisplay, BoyerMooreDisplay {
      * Colour a character based on its match status at this point in the progress of the algorithm.
      * @param match information about the state of a character match
      * @param fieldComponents the CharBox components corresponding to each display text field
-     * @param panel panel to repaint
      */
-    static void colourMatchedChar(SearchAlgorithm.MatchInfo match,
-                                  Map<Field, List<? extends CharBox>> fieldComponents, JPanel panel) {
+    default void colourMatchedChar(SearchAlgorithm.MatchInfo match,
+                                  Map<Field, List<? extends CharBox>> fieldComponents) {
         // colour depends on whether this char was a match or mismatch
         Color col = match.match() ? CharBox.MATCH_COL() : CharBox.MISMATCH_COL();
 
@@ -108,7 +107,7 @@ sealed interface SearchDisplay permits KMPDisplay, BoyerMooreDisplay {
         fieldComponents.get(Field.TEXT).get(match.textIndex()).setColor(col);
         fieldComponents.get(Field.PATT).get(match.pattIndex()).setColor(col);
 
-        panel.repaint();
+        panel().repaint();
     }
 
     /**
@@ -159,7 +158,7 @@ record KMPDisplay(
 
         switch (alg.state()) {
             case IN_PROGRESS -> {
-                SearchDisplay.colourMatchedChar(match, fieldComponents, panel);
+                colourMatchedChar(match, fieldComponents);
                 return;
             }
             case NO_MATCH -> { // no match exists in the text
@@ -242,7 +241,7 @@ record BoyerMooreDisplay(
 
         switch (alg.state()) {
             case IN_PROGRESS -> {
-                SearchDisplay.colourMatchedChar(match, fieldComponents, panel);
+                colourMatchedChar(match, fieldComponents);
                 return;
             }
             case NO_MATCH -> { // no match exists in the text

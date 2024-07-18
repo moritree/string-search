@@ -7,17 +7,14 @@ import java.util.Map;
 
 public class StringSearchUI extends JFrame {
     private static final Map<String, SearchDisplay> ALGORITHM_OPTIONS =
-            Map.of("Knuth-Morris-Pratt", new KMPDisplay(), "Boyer-Moore", new BoyerMooreDisplay());
+            Map.of("Knuth-Morris-Pratt", new KMPDisplay(),
+                    "Boyer-Moore", new BoyerMooreDisplay());
 
     // top level components
     private ControlPanel control;  // user input panel
     private JPanel cardPanel;  // panel using CardLayout switches display depending on algorithm
 
     public StringSearchUI() {
-        initialise();
-    }
-
-    private void initialise() {
         setTitle("String Search");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(480, 360));
@@ -25,10 +22,10 @@ public class StringSearchUI extends JFrame {
         // generate components
         control = new ControlPanel(ALGORITHM_OPTIONS.keySet().toArray(new String[0]));
 
+        // set up card panel
         cardPanel = new JPanel(new CardLayout());
-        ALGORITHM_OPTIONS.keySet().forEach(k -> {
-            cardPanel.add(ALGORITHM_OPTIONS.get(k).panel(), k);
-        });
+        // populate with display options for each algorithm
+        for (String k : ALGORITHM_OPTIONS.keySet()) { cardPanel.add(ALGORITHM_OPTIONS.get(k).panel(), k); }
         ((CardLayout)cardPanel.getLayout()).show(cardPanel, (String)control.algSelector.getSelectedItem());
 
         // add listeners
@@ -39,6 +36,7 @@ public class StringSearchUI extends JFrame {
             // show new selected display on cardPanel
             ((CardLayout)cardPanel.getLayout()).show(cardPanel, (String)control.algSelector.getSelectedItem());
 
+            // update new display's fields with whatever text the user has input
             updateString(control.text.getText(), SearchDisplay.Field.TEXT);
             updateString(control.patt.getText(), SearchDisplay.Field.PATT);
 
@@ -57,10 +55,18 @@ public class StringSearchUI extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * @return the current SearchDisplay selected by the user
+     */
     private SearchDisplay display() {
         return ALGORITHM_OPTIONS.get((String)control.algSelector.getSelectedItem());
     }
 
+    /**
+     * Update the state of a specific field of the current display
+     * @param s string value to update to
+     * @param field field to overwrite
+     */
     private void updateString(String s, SearchDisplay.Field field) {
         display().updateString(s, field);
         control.setAlgorithmControlsEnabled(display().ready());
@@ -68,8 +74,12 @@ public class StringSearchUI extends JFrame {
         revalidate();
     }
 
+    /**
+     * Take one step in the algorithm
+     */
     private void step() {
         display().step();
+        // can do more only if the state is ready to continue
         control.setAlgorithmControlsEnabled(display().ready());
     }
 
@@ -132,6 +142,5 @@ class ControlPanel extends JPanel {
 
     public void setAlgorithmControlsEnabled(Boolean b) {
         stepButton.setEnabled(b);
-//        for (Component component : algorithmControl.getComponents()) component.setEnabled(b);
     }
 }

@@ -3,16 +3,15 @@ package UI;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.util.List;
 import java.util.Map;
 
 public class StringSearchUI extends JFrame {
-    private final Map<String, SearchDisplay> algorithmOptions =
+    private static final Map<String, SearchDisplay> ALGORITHM_OPTIONS =
             Map.of("Knuth-Morris-Pratt", new KMPDisplay(), "Boyer-Moore", new BoyerMooreDisplay());
 
-    private ControlPanel control;
-    private SearchDisplay display;
-    private JPanel cardPanel;
+    // top level components
+    private ControlPanel control;  // user input panel
+    private JPanel cardPanel;  // panel using CardLayout switches display depending on algorithm
 
     public StringSearchUI() {
         initialise();
@@ -24,14 +23,12 @@ public class StringSearchUI extends JFrame {
         setMinimumSize(new Dimension(480, 360));
 
         // generate components
-        control = new ControlPanel(algorithmOptions.keySet().toArray(new String[0]));
-        display = new KMPDisplay();
+        control = new ControlPanel(ALGORITHM_OPTIONS.keySet().toArray(new String[0]));
 
         cardPanel = new JPanel(new CardLayout());
-        algorithmOptions.keySet().forEach(k -> {
-            cardPanel.add(algorithmOptions.get(k).panel(), k);
+        ALGORITHM_OPTIONS.keySet().forEach(k -> {
+            cardPanel.add(ALGORITHM_OPTIONS.get(k).panel(), k);
         });
-        display = algorithmOptions.get((String)control.algSelector.getSelectedItem());
         ((CardLayout)cardPanel.getLayout()).show(cardPanel, (String)control.algSelector.getSelectedItem());
 
         // add listeners
@@ -39,15 +36,13 @@ public class StringSearchUI extends JFrame {
         control.patt.addActionListener((e) -> updateString(control.patt.getText(), SearchDisplay.Field.PATT));
         control.stepButton.addActionListener((e) -> step());
         control.algSelector.addActionListener((e) -> {
-            // update current active display
-            display = algorithmOptions.get((String)control.algSelector.getSelectedItem());
-
-            // show in card
+            // show new selected display on cardPanel
             ((CardLayout)cardPanel.getLayout()).show(cardPanel, (String)control.algSelector.getSelectedItem());
 
             updateString(control.text.getText(), SearchDisplay.Field.TEXT);
             updateString(control.patt.getText(), SearchDisplay.Field.PATT);
-            display.panel().repaint();
+
+            display().panel().repaint(); // repaint display
         });
 
         // arrange everything
@@ -62,16 +57,20 @@ public class StringSearchUI extends JFrame {
         setVisible(true);
     }
 
+    private SearchDisplay display() {
+        return ALGORITHM_OPTIONS.get((String)control.algSelector.getSelectedItem());
+    }
+
     private void updateString(String s, SearchDisplay.Field field) {
-        display.updateString(s, field);
-        control.setAlgorithmControlsEnabled(display.ready());
+        display().updateString(s, field);
+        control.setAlgorithmControlsEnabled(display().ready());
 
         revalidate();
     }
 
     private void step() {
-        display.step();
-        control.setAlgorithmControlsEnabled(display.ready());
+        display().step();
+        control.setAlgorithmControlsEnabled(display().ready());
     }
 
     public static void main(String[] args) {

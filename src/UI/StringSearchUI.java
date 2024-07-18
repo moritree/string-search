@@ -11,8 +11,8 @@ public class StringSearchUI extends JFrame {
                     "Boyer-Moore", new BoyerMooreDisplay());
 
     // top level components
-    private ControlPanel control;  // user input panel
-    private JPanel cardPanel;  // panel using CardLayout switches display depending on algorithm
+    private final ControlPanel control;  // user input panel
+    private final JPanel cardPanel;  // panel using CardLayout switches display depending on algorithm
 
     public StringSearchUI() {
         setTitle("String Search");
